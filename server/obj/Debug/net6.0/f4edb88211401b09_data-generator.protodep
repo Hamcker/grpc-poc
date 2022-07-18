@@ -1,2 +1,0 @@
-obj/Debug/net6.0/Data-generatorGrpc.cs \
-obj/Debug/net6.0/DataGenerator.cs: ../contracts/data-generator.proto
