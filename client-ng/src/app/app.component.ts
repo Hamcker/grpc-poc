@@ -16,11 +16,11 @@ export class AppComponent {
 
   startStream() {
     const request = new RpcRequest();
-    request.setRequiredcount(100);
+    request.setRequiredcount(10000);
 
     this.grpcClient = grpc.invoke(DataProvider.GenerateData1, {
       request: request,
-      host: `http://localhost:5181`,
+      host: `https://localhost:7150`,
       onMessage: (message: RpcResponse1) => {
         // This section works when server writes something to stream.
 
