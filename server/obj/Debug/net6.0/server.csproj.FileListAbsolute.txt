@@ -27,3 +27,4 @@
 /Users/hamcker/sources/anywork/grpc-poc/server/obj/Debug/net6.0/server.pdb
 /Users/hamcker/sources/anywork/grpc-poc/server/obj/Debug/net6.0/server.genruntimeconfig.cache
 /Users/hamcker/sources/anywork/grpc-poc/server/obj/Debug/net6.0/ref/server.dll
+/Users/hamcker/sources/anywork/grpc-poc/server/bin/Debug/net6.0/Grpc.AspNetCore.Web.dll

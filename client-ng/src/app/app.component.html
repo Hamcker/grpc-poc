@@ -1,0 +1,16 @@
+<button (click)="startStream()">Start Stream</button>
+<button (click)="stopStream()">Stop Stream</button>
+
+<div class="total-rows">
+   {{ response?.totalrows }}
+</div>
+<div class="time-stamps">
+   <div class="time-stamp" *ngFor="let item of response?.timestampsList">
+      {{ item }}
+   </div>
+</div>
+<div class="results">
+   <div class="result" *ngFor="let item of response?.dataList">
+      {{ item.field1 }}
+   </div>
+</div>

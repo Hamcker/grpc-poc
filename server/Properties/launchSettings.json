@@ -3,8 +3,8 @@
     "server": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": false,
-      "applicationUrl": "http://localhost:5181",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:11005;",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
