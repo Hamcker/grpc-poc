@@ -59,8 +59,8 @@ export type TSendRequestResult = {
    response: TResponse;
 };
 
-// const BACKEND = 'https://localhost:7150';
-const BACKEND = 'http://localhost:5097';
+const BACKEND = 'https://localhost:7150';
+// const BACKEND = 'http://localhost:5097';
 
 @Injectable({
    providedIn: 'root',
@@ -126,28 +126,29 @@ export class BenchmarkGenService {
             switch (fields) {
                case 1:
                   const outlet = new ActualData1();
+                  const a = Randomizer.create<string>();
                   outlet.setField11(Randomizer.create<string>() ?? '');
                   return outlet;
 
                case 2:
                   const outlet2 = new ActualData2();
-                  outlet2.setField21(Randomizer.create<string>() ?? '');
-                  outlet2.setField22(Randomizer.create<number>() ?? 0);
+                  // outlet2.setField21(Randomizer.create<string>() ?? '');
+                  // outlet2.setField22(Randomizer.create<number>() ?? 0);
                   return outlet2;
 
                case 3:
                   const outlet3 = new ActualData3();
-                  outlet3.setField31(Randomizer.create<string>() ?? '');
-                  outlet3.setField32(Randomizer.create<number>() ?? 0);
-                  outlet3.setField33(Randomizer.create<boolean>() ?? false);
+                  // outlet3.setField31(Randomizer.create<string>() ?? '');
+                  // outlet3.setField32(Randomizer.create<number>() ?? 0);
+                  // outlet3.setField33(Randomizer.create<boolean>() ?? false);
                   return outlet3;
 
                case 4:
                   const outlet4 = new ActualData4();
-                  outlet4.setField41(Randomizer.create<string>() ?? '');
-                  outlet4.setField42(Randomizer.create<number>() ?? 0);
-                  outlet4.setField43(Randomizer.create<boolean>() ?? false);
-                  outlet4.setField44List(Randomizer.create<string[]>() ?? []);
+                  // outlet4.setField41(Randomizer.create<string>() ?? '');
+                  // outlet4.setField42(Randomizer.create<number>() ?? 0);
+                  // outlet4.setField43(Randomizer.create<boolean>() ?? false);
+                  // outlet4.setField44List(Randomizer.create<string[]>() ?? []);
                   return outlet4;
             }
          }),

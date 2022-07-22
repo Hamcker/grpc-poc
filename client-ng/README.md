@@ -1,5 +1,7 @@
 # Client-NG
 
+something
+
 ## How to generate TS services from .proto file
 
 1. Run `npm ci`
