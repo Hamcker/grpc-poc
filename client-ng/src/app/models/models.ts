@@ -1,17 +1,17 @@
 import { Observable } from 'rxjs';
+import { BenchmarkRecord } from './BenchmarkRecord';
 
-export interface IBenchmarkRecord {
+export interface IBenchmarkStep {
    operation: string;
    duration?: number;
    active?: boolean;
-   run: (...args: any[]) => Observable<any>;
 }
-export interface IBenchmarkRecordGroup {
-   records?: IBenchmarkRecord[];
-   conclusion?: IBenchmarkRecord;
+export interface IBenchmarkStepGroup {
+   steps?: BenchmarkRecord<any>[];
 }
 
 export interface IBenchmark {
    title: string;
-   results?: IBenchmarkRecordGroup[];
+   stepGroups?: IBenchmarkStepGroup[];
+   status?: number;
 }

@@ -1,13 +1,9 @@
 import { Component } from '@angular/core';
-import { grpc } from '@improbable-eng/grpc-web';
-import { Request } from '@improbable-eng/grpc-web/dist/typings/invoke';
 import * as moment from 'moment';
+import { range, filter, mergeMap, from, map, tap } from 'rxjs';
 
-import {
-   GenerateDataRequest as RpcRequest,
-   GenerateDataResponse1 as RpcResponse1,
-} from '../generated/data-generator_pb';
-import { DataProvider } from '../generated/data-generator_pb_service';
+import { IBenchmark, IBenchmarkStepGroup } from './models/models';
+import { BenchmarkGenService, TFields } from './services/benchmark-gen.service';
 
 @Component({
    selector: 'app-root',
@@ -18,44 +14,38 @@ export class AppComponent {
    benchmarks: IBenchmark[] = [
       {
          title: 'gRPC',
-         results: [
-            {
-               records: [
-                  {
-                     operation: 'send request 100 records',
-                     duration: 123,
-                     active: true,
-                  },
-                  {
-                     operation: 'send request 100 records',
-                     duration: 123,
-                  },
-               ],
-               conclusion: {
-                  operation: 'conc',
-                  duration: 12332,
-               },
-            },
-         ],
+         stepGroups: [],
       },
       {
          title: 'WebAPI',
-         results: [
-            {
-               records: [
-                  {
-                     operation: 'send request 100 records',
-                     duration: new Date().getTime(),
-                  },
-               ],
-               conclusion: {
-                  operation: 'conc',
-                  duration: 12332,
-               },
-            },
-         ],
+         stepGroups: [],
       },
    ];
+
+   constructor(private benchmarkService: BenchmarkGenService) {
+      range(1, 4)
+         .pipe(
+            mergeMap((x) =>
+               from([10, 100, 1000, 10000]).pipe(map((y) => [x, y]))
+            ),
+            tap(([fields, records]) => {
+               if (!this.benchmarks?.[0]?.stepGroups) return;
+               this.benchmarks[0].stepGroups.push(
+                  this.benchmarkService.generateGrpcGroup(
+                     records,
+                     fields as TFields,
+                     records
+                  )
+               );
+            })
+         )
+         .subscribe();
+   }
+
+   onRunClick(benchmark: IBenchmark) {
+      benchmark.status = 1;
+      this.benchmarkService.run(benchmark).subscribe();
+   }
 
    getDuration(ms: number, maxPrecission = 3) {
       const duration = moment.duration(ms);
@@ -67,47 +57,21 @@ export class AppComponent {
       items.push({ timeUnit: 's', value: duration.seconds() });
       items.push({ timeUnit: 'ms', value: duration.milliseconds() });
 
-      const formattedItems = items.reduce((accumulator, { value, timeUnit }) => {
-         if (accumulator.length >= maxPrecission || (accumulator.length === 0 && value === 0)) {
-            return accumulator;
-         }
+      const formattedItems = items.reduce(
+         (accumulator, { value, timeUnit }) => {
+            if (
+               accumulator.length >= maxPrecission ||
+               (accumulator.length === 0 && value === 0)
+            ) {
+               return accumulator;
+            }
 
-         accumulator.push(`${value}${timeUnit}`);
-         return accumulator;
-      }, []);
+            accumulator.push(`${value}${timeUnit}`);
+            return accumulator;
+         },
+         []
+      );
 
       return formattedItems.length !== 0 ? formattedItems.join(' ') : '-';
-   }
-
-   grpcClient!: Request;
-   response?: RpcResponse1.AsObject;
-
-   startStream() {
-      const request = new RpcRequest();
-      request.setRequiredcount(10000);
-
-      this.grpcClient = grpc.invoke(DataProvider.GenerateData1, {
-         request: request,
-         host: `https://localhost:7150`,
-         onMessage: (message: RpcResponse1) => {
-            // This section works when server writes something to stream.
-
-            const data = message.toObject();
-            this.response = data;
-         },
-         onEnd: (code: grpc.Code, msg: string | undefined, trailers: grpc.Metadata) => {
-            // This section works when server close connection.
-
-            if (code == grpc.Code.OK) {
-               console.log('request finished wihtout any error');
-            } else {
-               console.log('an error occured', code, msg, trailers);
-            }
-         },
-      });
-   }
-
-   stopStream() {
-      this.grpcClient.close();
    }
 }
