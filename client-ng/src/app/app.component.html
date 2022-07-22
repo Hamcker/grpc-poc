@@ -1,4 +1,34 @@
-<button (click)="startStream()">Start Stream</button>
+<div class="flex flex-col gap-3 p-3">
+   <div class="flex gap-3">
+      <div
+         class="border border-gray-200 rounded-lg shadow p-3 flex flex-col flex-1"
+         *ngFor="let benchmark of benchmarks"
+      >
+         <div class="text-lg font-bold text-center pb-3 border-b mb-3">{{ benchmark.title }}</div>
+
+         <div
+            class="border rounded-md shadow-sm px-2 divide-y divide-gray-100"
+            *ngFor="let result of benchmark.results"
+         >
+            <ng-container *ngFor="let item of result.records">
+               <div *ngTemplateOutlet="record; context: { $implicit: item }"></div>
+            </ng-container>
+         </div>
+      </div>
+   </div>
+</div>
+
+<ng-template #record let-rec>
+   <div class="flex py-1">
+      <div class="text-gray-400">{{ rec.operation }} {{ rec.active ? '...' : '' }}</div>
+      <div class="flex-1"></div>
+      <div class="text-gray-500 font-semibold">
+         {{ getDuration(rec.duration) }}
+      </div>
+   </div>
+</ng-template>
+
+<!-- <button (click)="startStream()">Start Stream</button>
 <button (click)="stopStream()">Stop Stream</button>
 
 <div class="total-rows">
@@ -13,4 +43,4 @@
    <div class="result" *ngFor="let item of response?.dataList">
       {{ item.field1 }}
    </div>
-</div>
+</div> -->

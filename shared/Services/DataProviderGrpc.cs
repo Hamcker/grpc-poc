@@ -16,7 +16,9 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         _fakeDataGenerator = fakeDataGenerator;
     }
 
-    public override Task<GenerateDataResponse1> GenerateData1(GenerateDataRequest request, ServerCallContext context)
+    
+
+    public override Task<GenerateDataResponse1> GenerateData1(GenerateDataRequest1 request, ServerCallContext context)
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -36,7 +38,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         return Task.FromResult(outlet);
     }
 
-    public override Task<GenerateDataResponse2> GenerateData2(GenerateDataRequest request, ServerCallContext context)
+    public override Task<GenerateDataResponse2> GenerateData2(GenerateDataRequest2 request, ServerCallContext context)
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -56,7 +58,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         return Task.FromResult(outlet);
     }
 
-    public override Task<GenerateDataResponse3> GenerateData3(GenerateDataRequest request, ServerCallContext context)
+    public override Task<GenerateDataResponse3> GenerateData3(GenerateDataRequest3 request, ServerCallContext context)
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -76,7 +78,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         return Task.FromResult(outlet);
     }
 
-    public override Task<GenerateDataResponse4> GenerateData4(GenerateDataRequest request, ServerCallContext context)
+    public override Task<GenerateDataResponse4> GenerateData4(GenerateDataRequest4 request, ServerCallContext context)
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();

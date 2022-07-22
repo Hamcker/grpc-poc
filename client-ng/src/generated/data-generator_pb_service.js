@@ -15,7 +15,7 @@ DataProvider.GenerateData1 = {
   service: DataProvider,
   requestStream: false,
   responseStream: false,
-  requestType: data_generator_pb.GenerateDataRequest,
+  requestType: data_generator_pb.GenerateDataRequest1,
   responseType: data_generator_pb.GenerateDataResponse1
 };
 
@@ -24,7 +24,7 @@ DataProvider.GenerateData2 = {
   service: DataProvider,
   requestStream: false,
   responseStream: false,
-  requestType: data_generator_pb.GenerateDataRequest,
+  requestType: data_generator_pb.GenerateDataRequest2,
   responseType: data_generator_pb.GenerateDataResponse2
 };
 
@@ -33,7 +33,7 @@ DataProvider.GenerateData3 = {
   service: DataProvider,
   requestStream: false,
   responseStream: false,
-  requestType: data_generator_pb.GenerateDataRequest,
+  requestType: data_generator_pb.GenerateDataRequest3,
   responseType: data_generator_pb.GenerateDataResponse3
 };
 
@@ -42,7 +42,7 @@ DataProvider.GenerateData4 = {
   service: DataProvider,
   requestStream: false,
   responseStream: false,
-  requestType: data_generator_pb.GenerateDataRequest,
+  requestType: data_generator_pb.GenerateDataRequest4,
   responseType: data_generator_pb.GenerateDataResponse4
 };
 

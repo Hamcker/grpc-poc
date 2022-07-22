@@ -9,7 +9,7 @@ type DataProviderGenerateData1 = {
   readonly service: typeof DataProvider;
   readonly requestStream: false;
   readonly responseStream: false;
-  readonly requestType: typeof data_generator_pb.GenerateDataRequest;
+  readonly requestType: typeof data_generator_pb.GenerateDataRequest1;
   readonly responseType: typeof data_generator_pb.GenerateDataResponse1;
 };
 
@@ -18,7 +18,7 @@ type DataProviderGenerateData2 = {
   readonly service: typeof DataProvider;
   readonly requestStream: false;
   readonly responseStream: false;
-  readonly requestType: typeof data_generator_pb.GenerateDataRequest;
+  readonly requestType: typeof data_generator_pb.GenerateDataRequest2;
   readonly responseType: typeof data_generator_pb.GenerateDataResponse2;
 };
 
@@ -27,7 +27,7 @@ type DataProviderGenerateData3 = {
   readonly service: typeof DataProvider;
   readonly requestStream: false;
   readonly responseStream: false;
-  readonly requestType: typeof data_generator_pb.GenerateDataRequest;
+  readonly requestType: typeof data_generator_pb.GenerateDataRequest3;
   readonly responseType: typeof data_generator_pb.GenerateDataResponse3;
 };
 
@@ -36,7 +36,7 @@ type DataProviderGenerateData4 = {
   readonly service: typeof DataProvider;
   readonly requestStream: false;
   readonly responseStream: false;
-  readonly requestType: typeof data_generator_pb.GenerateDataRequest;
+  readonly requestType: typeof data_generator_pb.GenerateDataRequest4;
   readonly responseType: typeof data_generator_pb.GenerateDataResponse4;
 };
 
@@ -81,39 +81,39 @@ export class DataProviderClient {
 
   constructor(serviceHost: string, options?: grpc.RpcOptions);
   generateData1(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest1,
     metadata: grpc.Metadata,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse1|null) => void
   ): UnaryResponse;
   generateData1(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest1,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse1|null) => void
   ): UnaryResponse;
   generateData2(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest2,
     metadata: grpc.Metadata,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse2|null) => void
   ): UnaryResponse;
   generateData2(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest2,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse2|null) => void
   ): UnaryResponse;
   generateData3(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest3,
     metadata: grpc.Metadata,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse3|null) => void
   ): UnaryResponse;
   generateData3(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest3,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse3|null) => void
   ): UnaryResponse;
   generateData4(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest4,
     metadata: grpc.Metadata,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse4|null) => void
   ): UnaryResponse;
   generateData4(
-    requestMessage: data_generator_pb.GenerateDataRequest,
+    requestMessage: data_generator_pb.GenerateDataRequest4,
     callback: (error: ServiceError|null, responseMessage: data_generator_pb.GenerateDataResponse4|null) => void
   ): UnaryResponse;
 }

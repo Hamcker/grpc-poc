@@ -5,18 +5,16 @@ option csharp_namespace = "Contracts";
 package contract;
 
 service DataProvider {
-  rpc GenerateData1 (GenerateDataRequest) returns (GenerateDataResponse1);
-  rpc GenerateData2 (GenerateDataRequest) returns (GenerateDataResponse2);
-  rpc GenerateData3 (GenerateDataRequest) returns (GenerateDataResponse3);
-  rpc GenerateData4 (GenerateDataRequest) returns (GenerateDataResponse4);
+  rpc GenerateData1 (GenerateDataRequest1) returns (GenerateDataResponse1);
+  rpc GenerateData2 (GenerateDataRequest2) returns (GenerateDataResponse2);
+  rpc GenerateData3 (GenerateDataRequest3) returns (GenerateDataResponse3);
+  rpc GenerateData4 (GenerateDataRequest4) returns (GenerateDataResponse4);
 }
 
-// Requests
-message GenerateDataRequest {
-  int32 requiredCount = 1;
+message GenerateDataRequest1 {
+  int32 RequiredCount = 1;
+  repeated ActualData1 Data = 4;
 }
-
-// Responsex
 message GenerateDataResponse1 {
   int32 TotalRows = 1;
   repeated string Timestamps = 2;
@@ -24,9 +22,15 @@ message GenerateDataResponse1 {
   repeated ActualData1 Data = 4;
 }
 message ActualData1 {
-  string Field1 = 1;
+  string Field11 = 1;
 }
 
+
+
+message GenerateDataRequest2 {
+  int32 requiredCount = 1;
+  repeated ActualData2 Data = 4;
+}
 message GenerateDataResponse2 {
   int32 TotalRows = 1;
   repeated string Timestamps = 2;
@@ -38,6 +42,11 @@ message ActualData2 {
   int32 Field22 = 2;
 }
 
+
+message GenerateDataRequest3 {
+  int32 requiredCount = 1;
+  repeated ActualData3 Data = 4;
+}
 message GenerateDataResponse3 {
   int32 TotalRows = 1;
   repeated string Timestamps = 2;
@@ -50,6 +59,11 @@ message ActualData3 {
   bool Field33 = 3;
 }
 
+
+message GenerateDataRequest4 {
+  int32 requiredCount = 1;
+  repeated ActualData4 Data = 4;
+}
 message GenerateDataResponse4 {
   int32 TotalRows = 1;
   repeated string Timestamps = 2;
@@ -57,8 +71,8 @@ message GenerateDataResponse4 {
   repeated ActualData4 Data = 4;
 }
 message ActualData4 {
-  string Field1 = 1;
-  int32 Field2 = 2;
-  bool Field3 = 3;
-  repeated string Field4 = 4;
+  string Field41 = 1;
+  int32 Field42 = 2;
+  bool Field43 = 3;
+  repeated string Field44 = 4;
 }
