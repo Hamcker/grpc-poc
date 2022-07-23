@@ -1,20 +1,24 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Request } from '@improbable-eng/grpc-web/dist/typings/invoke';
+
 import {
-   asapScheduler,
+   BehaviorSubject,
+   filter,
    from,
-   generate,
    map,
    mergeMap,
    Observable,
    of,
    range,
-   skip,
    switchMap,
    take,
    toArray,
 } from 'rxjs';
+
+import { delayWhen, tap } from 'rxjs/operators';
+
 import {
    ActualData1,
    ActualData2,
@@ -30,43 +34,36 @@ import {
    GenerateDataResponse4,
 } from 'src/generated/data-generator_pb';
 import { DataProvider } from 'src/generated/data-generator_pb_service';
-import { Randomizer } from 'ts-randomizer';
+
 import {
    BenchmarkRecord,
    BenchmarkRecord as BenchmarkStep,
 } from '../models/BenchmarkRecord';
 import {
    IBenchmark,
-   IBenchmarkStep,
    IBenchmarkStepGroup,
+   TGrpcActualData,
+   TGrpcResult,
+   TWebApiActualData,
+   TWebApiResponse,
 } from '../models/models';
+import { FakeDataService } from './fake-data.service';
 
 export type TFields = 1 | 2 | 3 | 4;
-export type TRequest =
-   | GenerateDataRequest1
-   | GenerateDataRequest2
-   | GenerateDataRequest3
-   | GenerateDataRequest4;
-export type TActualData = ActualData1 | ActualData2 | ActualData3 | ActualData4;
-export type TResponse =
-   | GenerateDataResponse1.AsObject
-   | GenerateDataResponse2.AsObject
-   | GenerateDataResponse3.AsObject
-   | GenerateDataResponse4.AsObject;
 
-export type TSendRequestResult = {
-   client: Request;
-   response: TResponse;
-};
-
-const BACKEND = 'https://localhost:7150';
-// const BACKEND = 'http://localhost:5097';
+const GRPC_SERVER = 'https://localhost:7150';
+const WEBAPI_SERVER = 'https://localhost:7013';
 
 @Injectable({
    providedIn: 'root',
 })
 export class BenchmarkGenService {
-   constructor() {}
+   activeRequests = new BehaviorSubject(0);
+
+   constructor(
+      private fakeData: FakeDataService,
+      private httpClient: HttpClient
+   ) {}
 
    generateGrpcGroup(
       payload: number,
@@ -77,16 +74,43 @@ export class BenchmarkGenService {
          steps: [
             new BenchmarkStep(
                `Generating payload (${fields} fields among ${payload} items)`,
-               () => this.generatePayload(payload, fields)
+               () => this.generateGrpcPayload(payload, fields)
             ),
-            new BenchmarkStep('Sending request', (data: any) =>
-               this.sendRequest(records, fields, data)
+            new BenchmarkStep('Send & Receive', (data: any) =>
+               this.sendGrpcRequest(records, fields, data)
             ),
             new BenchmarkStep(
-               'Conclusion',
-               (data: TSendRequestResult, step: BenchmarkStep) =>
-                  this.finalize(data, outlet, step)
+               'Generate data (server-side)',
+               (data: TGrpcResult, step: BenchmarkStep) =>
+                  this.getGrpcResponse(data, outlet, step)
             ),
+            new BenchmarkStep('Total', () => this.finalize(outlet)),
+         ],
+      };
+
+      return outlet;
+   }
+
+   generateWebApiGroup(
+      payload: number,
+      fields: TFields,
+      records: number
+   ): IBenchmarkStepGroup {
+      const outlet: IBenchmarkStepGroup = {
+         steps: [
+            new BenchmarkStep(
+               `Generating payload (${fields} fields among ${payload} items)`,
+               () => this.generateWebApiPayload(payload, fields)
+            ),
+            new BenchmarkStep('Send & Receive', (data: any) =>
+               this.sendWebApiRequest(records, fields, data)
+            ),
+            new BenchmarkStep(
+               'Generate data (server-side)',
+               (data: TWebApiResponse, step: BenchmarkStep) =>
+                  this.getWebApiResponse(data, outlet, step)
+            ),
+            new BenchmarkStep('Total', () => this.finalize(outlet)),
          ],
       };
 
@@ -95,14 +119,17 @@ export class BenchmarkGenService {
 
    run(benchmark: IBenchmark): Observable<any> {
       benchmark.status = 1;
-      const currentStep = 1;
+      benchmark.stepGroups?.forEach((group) =>
+         group.steps?.forEach((s) => (s.duration = undefined))
+      );
+
       return from(benchmark.stepGroups ?? []).pipe(
-         mergeMap((group) =>
-            from(group.steps ?? []).pipe(
+         mergeMap((group) => {
+            return from(group.steps ?? []).pipe(
                take(1),
                switchMap((task) => this.chain(group.steps ?? [], 0, []))
-            )
-         )
+            );
+         })
       );
    }
 
@@ -120,34 +147,34 @@ export class BenchmarkGenService {
       );
    }
 
-   private generatePayload(count: number, fields: TFields) {
+   private generateGrpcPayload(count: number, fields: TFields) {
       return range(0, count).pipe(
          map((x) => {
             switch (fields) {
                case 1:
                   const outlet = new ActualData1();
-                  const a = Randomizer.create<string>();
-                  outlet.setField11(Randomizer.create<string>() ?? '');
+                  const a = this.fakeData.getString();
+                  outlet.setField11(this.fakeData.getString());
                   return outlet;
 
                case 2:
                   const outlet2 = new ActualData2();
-                  // outlet2.setField21(Randomizer.create<string>() ?? '');
-                  // outlet2.setField22(Randomizer.create<number>() ?? 0);
+                  outlet2.setField21(this.fakeData.getString());
+                  outlet2.setField22(this.fakeData.getNumber());
                   return outlet2;
 
                case 3:
                   const outlet3 = new ActualData3();
-                  // outlet3.setField31(Randomizer.create<string>() ?? '');
-                  // outlet3.setField32(Randomizer.create<number>() ?? 0);
-                  // outlet3.setField33(Randomizer.create<boolean>() ?? false);
+                  outlet3.setField31(this.fakeData.getString());
+                  outlet3.setField32(this.fakeData.getNumber());
+                  outlet3.setField33(this.fakeData.getBoolean());
                   return outlet3;
 
                case 4:
                   const outlet4 = new ActualData4();
-                  // outlet4.setField41(Randomizer.create<string>() ?? '');
-                  // outlet4.setField42(Randomizer.create<number>() ?? 0);
-                  // outlet4.setField43(Randomizer.create<boolean>() ?? false);
+                  outlet4.setField41(this.fakeData.getString());
+                  outlet4.setField42(this.fakeData.getNumber());
+                  outlet4.setField43(this.fakeData.getBoolean());
                   // outlet4.setField44List(Randomizer.create<string[]>() ?? []);
                   return outlet4;
             }
@@ -155,12 +182,50 @@ export class BenchmarkGenService {
          toArray()
       );
    }
+   private generateWebApiPayload(count: number, fields: TFields) {
+      return range(0, count).pipe(
+         map((x) => {
+            switch (fields) {
+               case 1:
+                  const outlet: ActualData1.AsObject = {
+                     field11: this.fakeData.getString(),
+                  };
+                  return outlet;
 
-   private sendRequest<T extends TActualData>(
+               case 2:
+                  const outlet2: ActualData2.AsObject = {
+                     field21: this.fakeData.getString(),
+                     field22: this.fakeData.getNumber(),
+                  };
+                  return outlet2;
+
+               case 3:
+                  const outlet3: ActualData3.AsObject = {
+                     field31: this.fakeData.getString(),
+                     field32: this.fakeData.getNumber(),
+                     field33: this.fakeData.getBoolean(),
+                  };
+                  return outlet3;
+
+               case 4:
+                  const outlet4: ActualData4.AsObject = {
+                     field41: this.fakeData.getString(),
+                     field42: this.fakeData.getNumber(),
+                     field43: this.fakeData.getBoolean(),
+                     field44List: [],
+                  };
+                  return outlet4;
+            }
+         }),
+         toArray()
+      );
+   }
+
+   private sendGrpcRequest<T extends TGrpcActualData>(
       count: number,
       fields: TFields,
       data: T[]
-   ): Observable<TSendRequestResult> {
+   ): Observable<TGrpcResult> {
       switch (fields) {
          case 1:
             const request1 = new GenerateDataRequest1();
@@ -168,14 +233,14 @@ export class BenchmarkGenService {
             request1.setDataList(data as ActualData1[]);
 
             return from(
-               new Promise((res: (value: TSendRequestResult) => void) => {
+               new Promise((res: (value: TGrpcResult) => void) => {
                   const grpcClient = grpc.invoke(DataProvider.GenerateData1, {
                      request: request1,
-                     host: BACKEND,
+                     host: GRPC_SERVER,
                      onMessage: (message: GenerateDataResponse1) => {
                         res({
                            client: grpcClient,
-                           response: message.toObject(),
+                           response: message,
                         });
                      },
                      onEnd: this.onEnd,
@@ -189,14 +254,14 @@ export class BenchmarkGenService {
             request2.setDataList(data as ActualData2[]);
 
             return from(
-               new Promise((res: (value: TSendRequestResult) => void) => {
+               new Promise((res: (value: TGrpcResult) => void) => {
                   const grpcClient = grpc.invoke(DataProvider.GenerateData2, {
                      request: request2,
-                     host: BACKEND,
+                     host: GRPC_SERVER,
                      onMessage: (message: GenerateDataResponse2) => {
                         res({
                            client: grpcClient,
-                           response: message.toObject() as any,
+                           response: message as any,
                         });
                      },
                      onEnd: this.onEnd,
@@ -211,14 +276,14 @@ export class BenchmarkGenService {
             request3.setDataList(data as ActualData3[]);
 
             return from(
-               new Promise((res: (value: TSendRequestResult) => void) => {
+               new Promise((res: (value: TGrpcResult) => void) => {
                   const grpcClient = grpc.invoke(DataProvider.GenerateData3, {
                      request: request3,
-                     host: BACKEND,
+                     host: GRPC_SERVER,
                      onMessage: (message: GenerateDataResponse3) => {
                         res({
                            client: grpcClient,
-                           response: message.toObject() as any,
+                           response: message as any,
                         });
                      },
                      onEnd: this.onEnd,
@@ -226,20 +291,21 @@ export class BenchmarkGenService {
                })
             );
             break;
+
          case 4:
             const request4 = new GenerateDataRequest4();
             request4.setRequiredcount(count);
             request4.setDataList(data as ActualData4[]);
 
             return from(
-               new Promise((res: (value: TSendRequestResult) => void) => {
+               new Promise((res: (value: TGrpcResult) => void) => {
                   const grpcClient = grpc.invoke(DataProvider.GenerateData4, {
                      request: request4,
-                     host: BACKEND,
+                     host: GRPC_SERVER,
                      onMessage: (message: GenerateDataResponse4) => {
                         res({
                            client: grpcClient,
-                           response: message.toObject() as any,
+                           response: message as any,
                         });
                      },
                      onEnd: this.onEnd,
@@ -249,14 +315,75 @@ export class BenchmarkGenService {
             break;
       }
    }
+   private sendWebApiRequest<T extends TWebApiActualData>(
+      count: number,
+      fields: TFields,
+      data: T[]
+   ): Observable<TWebApiResponse> {
+      return of(null).pipe(
+         delayWhen(() => this.activeRequests.pipe(filter((x) => x < 4))),
+         switchMap(() => {
+            this.activeRequests.next(this.activeRequests.value + 1);
 
-   private finalize(
-      data: TSendRequestResult,
+            return this.httpClient
+               .post<TWebApiResponse>(
+                  WEBAPI_SERVER + '/GenerateData/GenerateData' + fields,
+                  { requiredCount: count, data }
+               )
+               .pipe(
+                  tap(() =>
+                     this.activeRequests.next(this.activeRequests.value - 1)
+                  )
+               );
+         })
+      );
+   }
+
+   private getGrpcResponse(
+      data: TGrpcResult,
       group: IBenchmarkStepGroup,
       record: BenchmarkStep
    ): Observable<any> {
-      record.duration = parseInt(data.response.timestampsList[0], 10);
+      const matches = /(\d{0,2}):(\d{0,2}):(\d{0,2}).(\d*)/.exec(
+         data.response.toObject().timestampsList[0]
+      );
+
+      const hour = parseInt(matches?.[1] ?? '0');
+      const minute = parseInt(matches?.[2] ?? '0');
+      const second = parseInt(matches?.[3] ?? '0');
+      const milis = parseInt(matches?.[4] ?? '0');
+
+      record.duration =
+         hour * 60 * 60000 + minute * 60000 + second * 1000 + milis;
+
       data.client.close();
+      return of(null);
+   }
+   private getWebApiResponse(
+      data: TWebApiResponse,
+      group: IBenchmarkStepGroup,
+      record: BenchmarkStep
+   ): Observable<any> {
+      const matches = /(\d{0,2}):(\d{0,2}):(\d{0,2}).(\d*)/.exec(
+         data.timestamps[0]
+      );
+
+      const hour = parseInt(matches?.[1] ?? '0');
+      const minute = parseInt(matches?.[2] ?? '0');
+      const second = parseInt(matches?.[3] ?? '0');
+      const milis = parseInt(matches?.[4] ?? '0');
+
+      record.duration =
+         hour * 60 * 60000 + minute * 60000 + second * 1000 + milis;
+
+      return of(null);
+   }
+
+   private finalize(group: IBenchmarkStepGroup) {
+      if (group.steps?.[group.steps?.length - 1])
+         group.steps[group.steps?.length - 1].duration = group.steps
+            ?.map((x) => x.duration ?? 0)
+            .reduce((a, c) => a + c, 0);
       return of(null);
    }
 
@@ -267,7 +394,6 @@ export class BenchmarkGenService {
    ) {
       // This section works when server close connection.
       if (code == grpc.Code.OK) {
-         console.log('request finished wihtout any error');
       } else {
          console.log('an error occured', code, msg, trailers);
       }

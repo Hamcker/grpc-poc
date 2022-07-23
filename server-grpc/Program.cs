@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // });
 
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(opts => opts.MaxReceiveMessageSize = int.MaxValue);
 builder.Services.AddSingleton<FakeDataGenerator>();
 builder.Services.AddCors(
     (opts) =>

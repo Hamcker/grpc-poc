@@ -25,13 +25,17 @@ export class AppComponent {
    constructor(private benchmarkService: BenchmarkGenService) {
       range(1, 4)
          .pipe(
-            mergeMap((x) =>
-               from([10, 100, 1000, 10000]).pipe(map((y) => [x, y]))
-            ),
+            mergeMap((x) => from([10, 100, 1000]).pipe(map((y) => [x, y]))),
             tap(([fields, records]) => {
-               if (!this.benchmarks?.[0]?.stepGroups) return;
-               this.benchmarks[0].stepGroups.push(
+               this.benchmarks[0].stepGroups!.push(
                   this.benchmarkService.generateGrpcGroup(
+                     records,
+                     fields as TFields,
+                     records
+                  )
+               );
+               this.benchmarks[1].stepGroups!.push(
+                  this.benchmarkService.generateWebApiGroup(
                      records,
                      fields as TFields,
                      records
