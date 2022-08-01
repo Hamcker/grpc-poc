@@ -1,0 +1,13 @@
+message GenerateDataRequest{{seq}} {
+  int32 requiredCount = 1;
+  repeated ActualData{{seq}} Data = 2;
+}
+message GenerateDataResponse{{seq}} {
+  int32 TotalRows = 1;
+  repeated string Timestamps = 2;
+  int64 TimeToGenerateRows = 3;
+  repeated ActualData{{seq}} Data = 4;
+}
+message ActualData{{seq}} {
+  {{fields}}
+}

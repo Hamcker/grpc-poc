@@ -1,0 +1,1 @@
+rpc GenerateData{{seq}} (GenerateDataRequest{{seq}}) returns (GenerateDataResponse{{seq}});

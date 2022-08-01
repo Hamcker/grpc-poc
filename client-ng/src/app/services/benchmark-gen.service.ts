@@ -49,7 +49,7 @@ import {
 } from '../models/models';
 import { FakeDataService } from './fake-data.service';
 
-export type TFields = 1 | 2 | 3 | 4;
+export type TFields = 1 | 2 | 3 | 40;
 
 const GRPC_SERVER = 'https://localhost:7150';
 const WEBAPI_SERVER = 'https://localhost:7013';
@@ -147,13 +147,13 @@ export class BenchmarkGenService {
       );
    }
 
-   private generateGrpcPayload(count: number, fields: TFields) {
+   private generateGrpcPayload(count: number, fields: TFields, depth = 10) {
       return range(0, count).pipe(
          map((x) => {
             switch (fields) {
                case 1:
                   const outlet = new ActualData1();
-                  const a = this.fakeData.getString();
+                  outlet.setField11(value);
                   outlet.setField11(this.fakeData.getString());
                   return outlet;
 
@@ -170,19 +170,41 @@ export class BenchmarkGenService {
                   outlet3.setField33(this.fakeData.getBoolean());
                   return outlet3;
 
-               case 4:
-                  const outlet4 = new ActualData4();
-                  outlet4.setField41(this.fakeData.getString());
-                  outlet4.setField42(this.fakeData.getNumber());
-                  outlet4.setField43(this.fakeData.getBoolean());
-                  // outlet4.setField44List(Randomizer.create<string[]>() ?? []);
-                  return outlet4;
+               case 40:
+                  const generate40 = (d = 1) => {
+                     if (d >= depth) return null;
+                     const outlet = new ActualData4();
+                     const generators = [
+                        this.fakeData.getString,
+                        this.fakeData.getStringArray,
+                        this.fakeData.getNumber,
+                        this.fakeData.getNumberArray,
+                        this.fakeData.getBoolean,
+                        this.fakeData.getBooleanArray,
+                        this.fakeData.getNumber,
+                        this.fakeData.getNumberArray,
+                        generate40.bind(this, d + 1),
+                        () => {
+                           const length = this.fakeData.next(2, 10);
+                           return Array.from({ length }).map(() =>
+                              generate40()
+                           );
+                        },
+                     ];
+                     for (let index = 0; index <= 40; index++) {
+                        const generator = generators[index % generators.length];
+                        const setField = (outlet as any)['setField4' + index];
+                        setField(generator());
+                     }
+                     return outlet;
+                  };
+                  return generate40();
             }
          }),
          toArray()
       );
    }
-   private generateWebApiPayload(count: number, fields: TFields) {
+   private generateWebApiPayload(count: number, fields: TFields, depth = 10) {
       return range(0, count).pipe(
          map((x) => {
             switch (fields) {
@@ -207,14 +229,34 @@ export class BenchmarkGenService {
                   };
                   return outlet3;
 
-               case 4:
-                  const outlet4: ActualData4.AsObject = {
-                     field41: this.fakeData.getString(),
-                     field42: this.fakeData.getNumber(),
-                     field43: this.fakeData.getBoolean(),
-                     field44List: [],
+               case 40:
+                  const generate40 = (d = 1) => {
+                     if (d >= depth) return null;
+                     const outlet = {};
+                     const generators = [
+                        this.fakeData.getString,
+                        this.fakeData.getStringArray,
+                        this.fakeData.getNumber,
+                        this.fakeData.getNumberArray,
+                        this.fakeData.getBoolean,
+                        this.fakeData.getBooleanArray,
+                        this.fakeData.getNumber,
+                        this.fakeData.getNumberArray,
+                        generate40.bind(this, d + 1),
+                        () => {
+                           const length = this.fakeData.next(2, 10);
+                           return Array.from({ length }).map(() =>
+                              generate40()
+                           );
+                        },
+                     ];
+                     for (let index = 0; index <= 40; index++) {
+                        const generator = generators[index % generators.length];
+                        (outlet as any)['setField4' + index] = generator();
+                     }
+                     return outlet as ActualData4.AsObject;
                   };
-                  return outlet4;
+                  return generate40();
             }
          }),
          toArray()

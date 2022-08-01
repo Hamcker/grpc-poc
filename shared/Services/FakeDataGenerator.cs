@@ -34,11 +34,21 @@ public class FakeDataGenerator
             case "String":
                 var minLength = rnd.Next(50, 70);
                 var maxLength = rnd.Next(100, 4000);
-                var bytes = Enumerable.Range(minLength, maxLength).Select(x =>
+                var bytes = Enumerable
+                    .Range(minLength, maxLength)
+                    .Select(x =>
                     {
                         // ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin
                         // var charCode = Convert.ToByte((x - minLength) / (maxLength - minLength) * (126 - 32) + 32);
-                        var charCode = Convert.ToByte(Math.Min(byte.MaxValue, Math.Max(byte.MinValue, ((x - minLength) * (126 - 32)) / (maxLength - minLength) + 32)));
+                        var charCode = Convert.ToByte(
+                            Math.Min(
+                                byte.MaxValue,
+                                Math.Max(
+                                    byte.MinValue,
+                                    ((x - minLength) * (126 - 32)) / (maxLength - minLength) + 32
+                                )
+                            )
+                        );
                         return charCode;
                     })
                     .ToArray();
@@ -62,7 +72,4 @@ public record DataGenerationStats<T>
         ElapsedTime = elapsedTime;
         Data = data;
     }
-
-
-
 }

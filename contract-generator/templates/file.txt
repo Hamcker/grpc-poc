@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option csharp_namespace = "Contracts";
+
+package contract;
+
+service DataProvider {
+  rpc GenerateData1 (GenerateDataRequest1) returns (GenerateDataResponse1);
+  rpc GenerateData2 (GenerateDataRequest2) returns (GenerateDataResponse2);
+  rpc GenerateData3 (GenerateDataRequest3) returns (GenerateDataResponse3);
+  {{services}}
+}
+
+message GenerateDataRequest1 {
+  int32 RequiredCount = 1;
+  repeated ActualData1 Data = 4;
+}
+message GenerateDataResponse1 {
+  int32 TotalRows = 1;
+  repeated string Timestamps = 2;
+  int64 TimeToGenerateRows = 3;
+  repeated ActualData1 Data = 4;
+}
+message ActualData1 {
+  string Field11 = 1;
+}
+
+
+
+message GenerateDataRequest2 {
+  int32 requiredCount = 1;
+  repeated ActualData2 Data = 4;
+}
+message GenerateDataResponse2 {
+  int32 TotalRows = 1;
+  repeated string Timestamps = 2;
+  int64 TimeToGenerateRows = 3;
+  repeated ActualData2 Data = 4;
+}
+message ActualData2 {
+  string Field21 = 1;
+  int32 Field22 = 2;
+}
+
+
+message GenerateDataRequest3 {
+  int32 requiredCount = 1;
+  repeated ActualData3 Data = 4;
+}
+message GenerateDataResponse3 {
+  int32 TotalRows = 1;
+  repeated string Timestamps = 2;
+  int64 TimeToGenerateRows = 3;
+  repeated ActualData3 Data = 4;
+}
+message ActualData3 {
+  string Field31 = 1;
+  int32 Field32 = 2;
+  bool Field33 = 3;
+}
+
+
+{{packs}}

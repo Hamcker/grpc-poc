@@ -7,9 +7,9 @@ export class FakeDataService {
    constructor() {}
 
    getString(): string {
-      var minLength = this.next(50, 70);
-      var maxLength = this.next(100, 500);
-      var bytes = Array.from({ length: maxLength })
+      const minLength = this.next(5, 10);
+      const maxLength = this.next(12, 15);
+      const bytes = Array.from({ length: maxLength })
          .map((x, i) => i + minLength)
          .map((x) => {
             var charCode = Math.min(
@@ -25,13 +25,25 @@ export class FakeDataService {
       var outlet = String.fromCharCode(...bytes);
       return outlet;
    }
+   getStringArray(): string[] {
+      const lenght = this.next(10, 20);
+      return Array.from({ length }).map(() => this.getString());
+   }
 
    getNumber(): number {
       return this.next(-500_000_000, 500_000_000);
    }
+   getNumberArray(): number[] {
+      const lenght = this.next(10, 20);
+      return Array.from({ length }).map(() => this.getNumber());
+   }
 
    getBoolean(): boolean {
       return Math.random() <= 0.5;
+   }
+   getBooleanArray(): boolean[] {
+      const lenght = this.next(10, 20);
+      return Array.from({ length }).map(() => this.getBoolean());
    }
 
    next(min: number, max: number): number {

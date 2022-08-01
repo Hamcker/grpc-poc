@@ -1,41 +1,60 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "build",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "build",
-        "${workspaceFolder}/server/server.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "publish",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "publish",
-        "${workspaceFolder}/server/server.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "watch",
-      "command": "dotnet",
-      "type": "process",
-      "args": [
-        "watch",
-        "run",
-        "--project",
-        "${workspaceFolder}/server/server.csproj"
-      ],
-      "problemMatcher": "$msCompile"
-    }
-  ]
+   "version": "2.0.0",
+   "tasks": [
+      {
+         "label": "build",
+         "command": "dotnet",
+         "type": "process",
+         "args": [
+            "build",
+            "${workspaceFolder}/server/server.csproj",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary"
+         ],
+         "problemMatcher": "$msCompile"
+      },
+      {
+         "label": "publish",
+         "command": "dotnet",
+         "type": "process",
+         "args": [
+            "publish",
+            "${workspaceFolder}/server/server.csproj",
+            "/property:GenerateFullPaths=true",
+            "/consoleloggerparameters:NoSummary"
+         ],
+         "problemMatcher": "$msCompile"
+      },
+      {
+         "label": "watch",
+         "command": "dotnet",
+         "type": "process",
+         "args": ["watch", "run", "--project", "${workspaceFolder}/server/server.csproj"],
+         "problemMatcher": "$msCompile"
+      },
+      {
+         "type": "typescript",
+         "tsconfig": "contract-generator/tsconfig.json",
+         "problemMatcher": ["$tsc"],
+         "group": "build",
+         "label": "tsc: build - contract-generator/tsconfig.json"
+      },
+      {
+         "label": "Build TypeScript servcies on MAC M1",
+         "type": "shell",
+         "command": "protoc",
+         "args": [
+            "--plugin=protoc-gen-ts=/Users/hamcker/sources/anywork/grpc-poc/client-ng/node_modules/ts-protoc-gen/bin/protoc-gen-ts",
+            "--js_out=import_style=commonjs,binary:./src/generated",
+            "--ts_out=service=grpc-web:./src/generated",
+            "--proto_path",
+            "../contracts data-generator.proto"
+         ],
+         "icon": {
+            "color": "terminal.ansiYellow",
+            "id": "book"
+         },
+         "problemMatcher": []
+      }
+   ]
 }
