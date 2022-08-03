@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import * as moment from 'moment';
 import { range, filter, mergeMap, from, map, tap } from 'rxjs';
+import { FIELDS_COUNT, MAX_DEPTH } from './code/injection-tokens';
 
 import { IBenchmark, IBenchmarkStepGroup } from './models/models';
 import { BenchmarkGenService, TFields } from './services/benchmark-gen.service';
@@ -9,6 +10,10 @@ import { BenchmarkGenService, TFields } from './services/benchmark-gen.service';
    selector: 'app-root',
    templateUrl: './app.component.html',
    styleUrls: ['./app.component.scss'],
+   providers: [
+      { provide: MAX_DEPTH, useValue: 4 },
+      { provide: FIELDS_COUNT, useValue: 20 },
+   ],
 })
 export class AppComponent {
    benchmarks: IBenchmark[] = [
@@ -23,7 +28,7 @@ export class AppComponent {
    ];
 
    constructor(private benchmarkService: BenchmarkGenService) {
-      range(1, 4)
+      from([3, 40])
          .pipe(
             mergeMap((x) => from([10, 100, 1000]).pipe(map((y) => [x, y]))),
             tap(([fields, records]) => {

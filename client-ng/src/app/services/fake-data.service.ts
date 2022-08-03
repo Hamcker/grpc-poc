@@ -26,7 +26,7 @@ export class FakeDataService {
       return outlet;
    }
    getStringArray(): string[] {
-      const lenght = this.next(10, 20);
+      const length = this.next(10, 20);
       return Array.from({ length }).map(() => this.getString());
    }
 
@@ -34,7 +34,7 @@ export class FakeDataService {
       return this.next(-500_000_000, 500_000_000);
    }
    getNumberArray(): number[] {
-      const lenght = this.next(10, 20);
+      const length = this.next(10, 20);
       return Array.from({ length }).map(() => this.getNumber());
    }
 

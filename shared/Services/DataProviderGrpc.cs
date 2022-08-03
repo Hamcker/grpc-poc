@@ -16,9 +16,10 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         _fakeDataGenerator = fakeDataGenerator;
     }
 
-    
-
-    public override Task<GenerateDataResponse1> GenerateData1(GenerateDataRequest1 request, ServerCallContext context)
+    public override Task<GenerateDataResponse1> GenerateData1(
+        GenerateDataRequest1 request,
+        ServerCallContext context
+    )
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -27,10 +28,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         var fakeData = _fakeDataGenerator.Generate<ActualData1>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse1
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse1 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -38,7 +36,10 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         return Task.FromResult(outlet);
     }
 
-    public override Task<GenerateDataResponse2> GenerateData2(GenerateDataRequest2 request, ServerCallContext context)
+    public override Task<GenerateDataResponse2> GenerateData2(
+        GenerateDataRequest2 request,
+        ServerCallContext context
+    )
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -47,10 +48,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         var fakeData = _fakeDataGenerator.Generate<ActualData2>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse2
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse2 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -58,7 +56,10 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         return Task.FromResult(outlet);
     }
 
-    public override Task<GenerateDataResponse3> GenerateData3(GenerateDataRequest3 request, ServerCallContext context)
+    public override Task<GenerateDataResponse3> GenerateData3(
+        GenerateDataRequest3 request,
+        ServerCallContext context
+    )
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -67,10 +68,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         var fakeData = _fakeDataGenerator.Generate<ActualData3>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse3
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse3 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -78,7 +76,10 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         return Task.FromResult(outlet);
     }
 
-    public override Task<GenerateDataResponse4> GenerateData4(GenerateDataRequest4 request, ServerCallContext context)
+    public override Task<GenerateDataResponse4> GenerateData4(
+        GenerateDataRequest4 request,
+        ServerCallContext context
+    )
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -87,10 +88,7 @@ public class DataProviderGrpc : DataProvider.DataProviderBase
         var fakeData = _fakeDataGenerator.Generate<ActualData4>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse4
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse4 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);

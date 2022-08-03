@@ -26,10 +26,7 @@ public class GenerateDataController : ControllerBase
         var fakeData = _fakeDataGenerator.Generate<ActualData1>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse1
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse1 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -47,10 +44,7 @@ public class GenerateDataController : ControllerBase
         var fakeData = _fakeDataGenerator.Generate<ActualData2>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse2
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse2 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -68,10 +62,7 @@ public class GenerateDataController : ControllerBase
         var fakeData = _fakeDataGenerator.Generate<ActualData3>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse3
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse3 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -79,8 +70,8 @@ public class GenerateDataController : ControllerBase
         return Ok(outlet);
     }
 
-    [HttpPost("GenerateData4")]
-    public IActionResult GenerateData4(GenerateDataRequest4 request)
+    [HttpPost("GenerateData40")]
+    public IActionResult GenerateData40(GenerateDataRequest4 request)
     {
         var timer = new Stopwatch();
         var timestamps = new List<string>();
@@ -89,10 +80,7 @@ public class GenerateDataController : ControllerBase
         var fakeData = _fakeDataGenerator.Generate<ActualData4>(request.RequiredCount, timer);
         timestamps.Add(fakeData.ElapsedTime.ToString());
 
-        var outlet = new GenerateDataResponse4
-        {
-            TotalRows = request.RequiredCount,
-        };
+        var outlet = new GenerateDataResponse4 { TotalRows = request.RequiredCount, };
 
         outlet.Data.AddRange(fakeData.Data);
         outlet.Timestamps.AddRange(timestamps);
@@ -100,4 +88,3 @@ public class GenerateDataController : ControllerBase
         return Ok(outlet);
     }
 }
-

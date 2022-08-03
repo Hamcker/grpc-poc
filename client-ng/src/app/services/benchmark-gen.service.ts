@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, inject, Injectable, Optional } from '@angular/core';
 import { grpc } from '@improbable-eng/grpc-web';
 import { Request } from '@improbable-eng/grpc-web/dist/typings/invoke';
 
@@ -34,6 +34,7 @@ import {
    GenerateDataResponse4,
 } from 'src/generated/data-generator_pb';
 import { DataProvider } from 'src/generated/data-generator_pb_service';
+import { FIELDS_COUNT, MAX_DEPTH } from '../code/injection-tokens';
 
 import {
    BenchmarkRecord,
@@ -62,8 +63,13 @@ export class BenchmarkGenService {
 
    constructor(
       private fakeData: FakeDataService,
-      private httpClient: HttpClient
-   ) {}
+      private httpClient: HttpClient,
+      @Optional() @Inject(MAX_DEPTH) private maxDepth: number,
+      @Optional() @Inject(FIELDS_COUNT) private fieldsCount: number
+   ) {
+      this.maxDepth ??= 3;
+      this.fieldsCount ??= 20;
+   }
 
    generateGrpcGroup(
       payload: number,
@@ -147,13 +153,12 @@ export class BenchmarkGenService {
       );
    }
 
-   private generateGrpcPayload(count: number, fields: TFields, depth = 10) {
+   private generateGrpcPayload(count: number, fields: TFields) {
       return range(0, count).pipe(
          map((x) => {
             switch (fields) {
                case 1:
                   const outlet = new ActualData1();
-                  outlet.setField11(value);
                   outlet.setField11(this.fakeData.getString());
                   return outlet;
 
@@ -171,30 +176,35 @@ export class BenchmarkGenService {
                   return outlet3;
 
                case 40:
-                  const generate40 = (d = 1) => {
-                     if (d >= depth) return null;
+                  const generate40 = (depth = 1) => {
+                     if (depth >= this.maxDepth) return null;
                      const outlet = new ActualData4();
+
                      const generators = [
-                        this.fakeData.getString,
-                        this.fakeData.getStringArray,
-                        this.fakeData.getNumber,
-                        this.fakeData.getNumberArray,
-                        this.fakeData.getBoolean,
-                        this.fakeData.getBooleanArray,
-                        this.fakeData.getNumber,
-                        this.fakeData.getNumberArray,
-                        generate40.bind(this, d + 1),
+                        this.fakeData.getString.bind(this.fakeData),
+                        this.fakeData.getStringArray.bind(this.fakeData),
+                        this.fakeData.getNumber.bind(this.fakeData),
+                        this.fakeData.getNumberArray.bind(this.fakeData),
+                        this.fakeData.getBoolean.bind(this.fakeData),
+                        this.fakeData.getBooleanArray.bind(this.fakeData),
+                        this.fakeData.getNumber.bind(this.fakeData),
+                        this.fakeData.getNumberArray.bind(this.fakeData),
+                        generate40.bind(this, depth + 1),
                         () => {
                            const length = this.fakeData.next(2, 10);
-                           return Array.from({ length }).map(() =>
-                              generate40()
-                           );
+                           return Array.from({ length })
+                              .map(() => generate40(depth + 1))
+                              .filter((x) => x);
                         },
                      ];
-                     for (let index = 0; index <= 40; index++) {
-                        const generator = generators[index % generators.length];
-                        const setField = (outlet as any)['setField4' + index];
-                        setField(generator());
+                     for (let index = 0; index <= this.fieldsCount; index++) {
+                        const generator: any =
+                           generators[index % generators.length];
+                        const setField =
+                           (outlet as any)['setField4' + index] ??
+                           (outlet as any)[`setField4${index}List`];
+                        const value = generator();
+                        setField.call(outlet, value);
                      }
                      return outlet;
                   };
@@ -204,7 +214,7 @@ export class BenchmarkGenService {
          toArray()
       );
    }
-   private generateWebApiPayload(count: number, fields: TFields, depth = 10) {
+   private generateWebApiPayload(count: number, fields: TFields) {
       return range(0, count).pipe(
          map((x) => {
             switch (fields) {
@@ -230,31 +240,40 @@ export class BenchmarkGenService {
                   return outlet3;
 
                case 40:
-                  const generate40 = (d = 1) => {
-                     if (d >= depth) return null;
+                  const generate40 = (depth = 1) => {
+                     if (depth >= this.maxDepth) return null;
                      const outlet = {};
+
                      const generators = [
-                        this.fakeData.getString,
-                        this.fakeData.getStringArray,
-                        this.fakeData.getNumber,
-                        this.fakeData.getNumberArray,
-                        this.fakeData.getBoolean,
-                        this.fakeData.getBooleanArray,
-                        this.fakeData.getNumber,
-                        this.fakeData.getNumberArray,
-                        generate40.bind(this, d + 1),
+                        this.fakeData.getString.bind(this.fakeData),
+                        this.fakeData.getStringArray.bind(this.fakeData),
+                        this.fakeData.getNumber.bind(this.fakeData),
+                        this.fakeData.getNumberArray.bind(this.fakeData),
+                        this.fakeData.getBoolean.bind(this.fakeData),
+                        this.fakeData.getBooleanArray.bind(this.fakeData),
+                        this.fakeData.getNumber.bind(this.fakeData),
+                        this.fakeData.getNumberArray.bind(this.fakeData),
+                        generate40.bind(this, depth + 1),
                         () => {
                            const length = this.fakeData.next(2, 10);
-                           return Array.from({ length }).map(() =>
-                              generate40()
-                           );
+                           return Array.from({ length })
+                              .map(() => generate40(depth + 1))
+                              .filter((x) => x);
                         },
                      ];
-                     for (let index = 0; index <= 40; index++) {
-                        const generator = generators[index % generators.length];
-                        (outlet as any)['setField4' + index] = generator();
+                     for (let index = 0; index <= this.fieldsCount; index++) {
+                        const generator: any =
+                           generators[index % generators.length];
+
+                        const value = generator.call(this.fakeData);
+
+                        if (value instanceof Array) {
+                           (outlet as any)[`field4${index}List`] = value;
+                        } else {
+                           (outlet as any)['field4' + index] = value;
+                        }
                      }
-                     return outlet as ActualData4.AsObject;
+                     return outlet;
                   };
                   return generate40();
             }
@@ -334,7 +353,7 @@ export class BenchmarkGenService {
             );
             break;
 
-         case 4:
+         case 40:
             const request4 = new GenerateDataRequest4();
             request4.setRequiredcount(count);
             request4.setDataList(data as ActualData4[]);
@@ -422,10 +441,13 @@ export class BenchmarkGenService {
    }
 
    private finalize(group: IBenchmarkStepGroup) {
-      if (group.steps?.[group.steps?.length - 1])
-         group.steps[group.steps?.length - 1].duration = group.steps
-            ?.map((x) => x.duration ?? 0)
-            .reduce((a, c) => a + c, 0);
+      if (group.steps?.[group.steps?.length - 1]) {
+         const sum =
+            (group.steps[0].duration ?? 0) + (group.steps[1].duration ?? 0);
+
+         group.steps[group.steps?.length - 1].duration = sum;
+      }
+
       return of(null);
    }
 
